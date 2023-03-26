@@ -1,4 +1,4 @@
-# Interactive Maps for Rshiny
+# Interactive Maps for RShiny and Rmarkdown
 
 Collection of codes and hints on how to incorporate interactive maps into Rshiny.
 
@@ -80,7 +80,7 @@ The geojson files for US states and counties could be downloaded from \<a href="
                        layerId = ma_towns_spacial$TOWN
           )
 
-![](images/Screenshot%202023-03-16%20at%207.27.52%20AM.png)
+![](images/Screenshot%202023-03-16%20at%207.27.52%20AM.png){width="538"}
 
     ```
 

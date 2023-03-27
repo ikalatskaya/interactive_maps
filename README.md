@@ -4,27 +4,30 @@ Collection of codes and hints on how to incorporate interactive maps into Rshiny
 
 Leaflet is the leading open-source JavaScript-based library for mobile-friendly interactive maps: [`https://leafletjs.com/.`](https://leafletjs.com/%22)
 
-`It was explicitly designed for plotting geographical features. Leaflet and the leaflet.js library are fee to use without restriction.`
+It was explicitly designed for plotting geographical features. Leaflet and leaflet.js libraries are free to use without restrictions.
+
+## Map markers
 
 ### Install and load libraries
 
     library(leaflet)
     library(dplyr)
     library(sf)
+    library(geojsonio)
 
 ### Show towns and cities in MA using scatter geomarker plots
 
 To show location of the town on the map, we will need its latitude and longitude. I found this information over here: <https://www.mapsofworld.com/usa/states/massachusetts/lat-long.html>" for Massachusetts towns and cities.
 
-    index = read.table("data/MA_lat_and_long.txt", sep = "\t", header = TRUE)
+    geolocation_ma_towns = read.table("data/MA_lat_and_long_updated.txt", sep = "\t", header = TRUE)
 
-    index %>% leaflet() %>% addTiles() %>% addMarkers(label = ~Location) %>% setView(lng = -71.0589, lat = 42.3601, zoom = 8)
+    geolocation_ma_towns %>% na.omit() %>% leaflet() %>% addTiles() %>% addMarkers(label = ~town, lat = ~latitude, lng = ~longitude) %>% setView(lng = -71.0589, lat = 42.3601, zoom = 8)
 
 ![](images/Screenshot%202023-03-15%20at%206.57.02%20PM.png "Towns and cities in MA"){width="434"}
 
 To cluster markers together for better visualization:
 
-    index %>% leaflet() %>% addTiles() %>% addMarkers(label = ~Location, lat = ~Latitude, lng = ~Longitude) %>% setView(lng = -71.0589, lat = 42.3601, zoom = 8)
+    geolocation_ma_towns %>% na.omit() %>% leaflet() %>% addTiles() %>% addCircleMarkers(label = ~town, lat = ~latitude, lng = ~longitude, radius = 8, clusterOptions = markerClusterOptions()) %>% setView(lng = -71.0589, lat = 42.3601, zoom = 8)
 
 ![](images/Screenshot%202023-03-15%20at%207.06.50%20PM.png){width="434"}
 
@@ -40,6 +43,8 @@ And added to leaflet through the following function:
 
 \`\` %\>% `addProviderTiles(providers$OpenTopoMap)`\`\`
 
+## Map shapes
+
 ### Obtaining JSON and ESRI shapefiles
 
 GeoJSON is an open standard format designed for representing simple geographical features, along with their non-spatial attributes, based on JavaScript Object Notation.
@@ -50,15 +55,45 @@ GeoJSON is an open standard format designed for representing simple geographical
 
 ### Importing GeoJSON and ESRI shapefiles
 
-Import shape files with library(sf). ESRI must contain at least the dbf, the shp and the shx files.
+Import shape files with library(sf).
 
-    library(sf)
+ESRI must contain at least the dbf, the shp and the shx files.
 
     df <- read_sf(dsn = "path_to_folder_with_ESRI_files")
 
+Or, as an option, shape data could be read geojson or other formats from a local file or a URL. Data will be stored as sp object.
+
     states <- geojsonio::geojson_read("https://rstudio.github.io/leaflet/json/us-states.geojson", what = "sp")
 
-Data will be stored as sf object.
+
+    leaflet() %>% addTiles() %>%
+         setView(-72.015193, 42.414006,  zoom = 8) %>%
+         addPolygons( data = states,
+                      fillOpacity = 0,
+                      opacity = 0.3,
+                      color = "#000000",
+                      weight = 3,
+                      layerId = states$name
+         )
+
+![](images/Screenshot%202023-03-26%20at%209.54.24%20PM.png){width="434"}
+
+There is a way to parse sp object and cut only the shape of the specific state:
+
+
+    temp = states[states@data$id == 25,]
+
+    leaflet() %>% addTiles() %>%
+         setView(-72.015193, 42.414006,  zoom = 8) %>%
+         addPolygons( data = temp,
+                      fillOpacity = 0,
+                      opacity = 0.3,
+                      color = "#000000",
+                      weight = 3,
+                      layerId = temp$name
+         )
+
+![](images/Screenshot%202023-03-26%20at%209.57.47%20PM.png){width="434"}
 
 ### States and counties
 
@@ -80,11 +115,12 @@ The geojson files for US states and counties could be downloaded from \<a href="
                        layerId = ma_towns_spacial$TOWN
           )
 
-![](images/Screenshot%202023-03-16%20at%207.27.52%20AM.png){width="538"}
+![](images/Screenshot%202023-03-16%20at%207.27.52%20AM.png){width="434"}
 
     ```
 
-    index %>% leaflet() %>% addTiles() %>% addProviderTiles(providers$NASAGIBS.ViirsEarthAtNight2012) %>% addCircleMarkers(label = ~Location,clusterOptions = markerClusterOptions()) %>% setView(lng = -71.0589, lat = 42.3601, zoom = 8)
+    index %>% na.omit() %>% leaflet() %>% addTiles() %>% addProviderTiles(providers$NASAGIBS.ViirsEarthAtNight2012) %>% addCircleMarkers(label = ~town
+    ,clusterOptions = markerClusterOptions()) %>% setView(lng = -71.0589, lat = 42.3601, zoom = 8)
 
 
     ```
@@ -92,6 +128,18 @@ The geojson files for US states and counties could be downloaded from \<a href="
 ### Choropleth map
 
 Choropleth map is map that uses differences in shading or coloring within predefined areas to indicate the average values of a property or quantity in those areas.
+
+### Rshiny apps
+
+1.  towns_in_MA.R
+
+    Shows how to mark MA towns based on the user's selection:
+
+![](images/Screenshot%202023-03-26%20at%2010.05.05%20PM.png){width="434"}
+
+2.  clickable_map_ma_county.R
+
+    ![](images/Screenshot%202023-03-26%20at%2010.07.17%20PM.png){width="434"}
 
 ### Other interesting resources:
 

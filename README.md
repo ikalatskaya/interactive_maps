@@ -24,7 +24,7 @@ To show location of the town on the map, we will need its latitude and longitude
 
 To cluster markers together for better visualization:
 
-    index %>% leaflet() %>% addTiles() %>% addCircleMarkers(label = ~Location,clusterOptions = markerClusterOptions()) %>% setView(lng = -71.0589, lat = 42.3601, zoom = 8)
+    index %>% leaflet() %>% addTiles() %>% addMarkers(label = ~Location, lat = ~Latitude, lng = ~Longitude) %>% setView(lng = -71.0589, lat = 42.3601, zoom = 8)
 
 ![](images/Screenshot%202023-03-15%20at%207.06.50%20PM.png){width="434"}
 

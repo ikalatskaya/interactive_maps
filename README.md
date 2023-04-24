@@ -80,7 +80,6 @@ Or, as an option, shape data could be read geojson or other formats from a local
 
 There is a way to parse sp object and cut only the shape of the specific state:
 
-
     temp = states[states@data$id == 25,]
 
     leaflet() %>% addTiles() %>%
@@ -133,13 +132,15 @@ Choropleth map is map that uses differences in shading or coloring within predef
 
 1.  towns_in_MA.R
 
-    Shows how to mark MA towns based on the user's selection:
+Shows how to mark MA towns based on the user's selection:
 
-![](images/Screenshot%202023-03-26%20at%2010.05.05%20PM.png){width="434"}
+![](images/Screenshot%202023-03-26%20at%2010.05.05%20PM.png){width="450"}
 
 2.  clickable_map_ma_county.R
 
-    ![](images/Screenshot%202023-03-26%20at%2010.07.17%20PM.png){width="434"}
+The user is able to select a county from the downdown menu or click on the map.
+
+![](images/Screenshot%202023-04-03%20at%209.11.10%20PM.png){width="450"}
 
 ### Other interesting resources:
 
